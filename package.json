@@ -1,0 +1,31 @@
+{
+    "name": "mmm-dailyzapiro",
+    "version": "1.0.0",
+    "description": "A MagicMirror² Module to display cartoons by Zapiro.",
+    "main": "index.js",
+    "scripts": {
+        "build": "rollup -c"
+    },
+    "author": "Courtney Pitcher",
+    "license": "CC-BY-SA-NC-4.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/IgniparousTempest/MMM-DailyZapiro.git"
+    },
+    "bugs": {
+        "url": "https://github.com/IgniparousTempest/MMM-DailyZapiro/issues"
+    },
+    "homepage": "https://github.com/IgniparousTempest/MMM-DailyZapiro#readme",
+    "devDependencies": {
+        "@types/magicmirror-module": "^2.16.1",
+        "@types/node-fetch": "^2.6.2",
+        "fast-xml-parser": "^4.0.11",
+        "node-fetch": "^2.6.7",
+        "rollup": "^3.2.5",
+        "rollup-plugin-banner": "^0.2.1",
+        "rollup-plugin-commonjs": "^10.1.0",
+        "rollup-plugin-node-resolve": "^5.2.0",
+        "rollup-plugin-typescript": "^1.0.1",
+        "typescript": "^4.8.4"
+    }
+}
