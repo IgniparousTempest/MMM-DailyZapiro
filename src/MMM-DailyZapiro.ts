@@ -2,13 +2,22 @@ import {Config} from "./Config";
 
 Module.register<Config>('MMM-DailyZapiro', {
     defaults: {
-        mostRecentNComics: 3
+        colour: false,
+        mostRecentNComics: 3,
+        updateInterval: 60
     },
     _retrievedData: null,
 
     start: function() {
+        // Validate input
+        if (this.config.mostRecentNComics <= 0)
+            throw new Error("'mostRecentNComics' should be a positive integer.");
+        if (this.config.updateInterval <= 0)
+            throw new Error("'updateInterval' should be a positive integer.");
+
+        // Retrieve data
         this.sendSocketNotification("REQUEST_ZAPIRO_CARTOON", {...this.config});
-        setInterval(() => this.sendSocketNotification("REQUEST_ZAPIRO_CARTOON", {...this.config}), 60000);
+        setInterval(() => this.sendSocketNotification("REQUEST_ZAPIRO_CARTOON", {...this.config}), this.config.updateInterval * 1000);
     },
 
     getTemplate() {
@@ -20,7 +29,10 @@ Module.register<Config>('MMM-DailyZapiro', {
      */
     getTemplateData: function() {
         if (!this._retrievedData) {
-            return {};
+            return {
+                imageUrl: `${this.data.path}/data/ZApiro.png`,
+                config: this.config
+            };
         }
 
         return {

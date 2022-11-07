@@ -24,10 +24,20 @@ Copy the parent folder to `/modules/`.
 
 The following properties can be configured:
 
-| Option              | Description                                                                                                                                                               |
-|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mostRecentNComics` | Cycle through the n most recent comics. Setting the value to `1` will show only the latest comic. <br><br> **Possible values:** `1` to `9999` <br> **Default value:** `3` |
+| Option              | Description                                                                                                                                                                                            |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `colour`            | Whether to show comics in their original colour (`true`), or in an inverted, high contrast, black and white (`false`). <br><br> **Possible values:** `true` or `false` <br> **Default value:** `false` |
+| `mostRecentNComics` | Cycle through the n most recent comics. Setting the value to `1` will show only the latest comic. <br><br> **Possible values:** `1` to positive infinity <br> **Default value:** `3`                   |
+| `updateInterval`    | How frequently a new comic is fetched in seconds. `86400` would be once ber day. <br><br> **Possible values:** `1` to positive infinity <br> **Default value:** `60`                                   |
 
 ## In action
 
 ![](./docs/screenshot.gif)
+
+## Notes
+
+Inspired by the MagicMirror plugin [MMM-DailyDilbert](https://github.com/andrecarlucci/MMM-DailyDilbert).
+
+This module is written in typescript, as such the javascript files in the root are automatically generated, the actual source code is in [/src](./src).
+
+The module scrapes the sitemap of the Daily Maverick, and as such does not show comics from his Mail and Guardian days.

@@ -1,6 +1,6 @@
 /**
  * MagicMirror Module: Daily Zapiro
- * A MagicMirror² Module to show cartoons by Zapiro.
+ * A MagicMirror² Module to display cartoons by Zapiro.
  * 
  * Version 1.0.0
  * By Courtney Pitcher
@@ -13,7 +13,7 @@
 (function () {
     'use strict';
 
-    /*! *****************************************************************************
+    /******************************************************************************
     Copyright (c) Microsoft Corporation.
 
     Permission to use, copy, modify, and/or distribute this software for any
@@ -41,13 +41,21 @@
 
     Module.register('MMM-DailyZapiro', {
         defaults: {
-            mostRecentNComics: 3
+            colour: false,
+            mostRecentNComics: 3,
+            updateInterval: 60
         },
         _retrievedData: null,
         start: function () {
             var _this = this;
+            // Validate input
+            if (this.config.mostRecentNComics <= 0)
+                throw new Error("'mostRecentNComics' should be a positive integer.");
+            if (this.config.updateInterval <= 0)
+                throw new Error("'updateInterval' should be a positive integer.");
+            // Retrieve data
             this.sendSocketNotification("REQUEST_ZAPIRO_CARTOON", __assign({}, this.config));
-            setInterval(function () { return _this.sendSocketNotification("REQUEST_ZAPIRO_CARTOON", __assign({}, _this.config)); }, 60000);
+            setInterval(function () { return _this.sendSocketNotification("REQUEST_ZAPIRO_CARTOON", __assign({}, _this.config)); }, this.config.updateInterval * 1000);
         },
         getTemplate: function () {
             return "MMM-DailyZapiro.njk";
@@ -57,7 +65,10 @@
          */
         getTemplateData: function () {
             if (!this._retrievedData) {
-                return {};
+                return {
+                    imageUrl: "".concat(this.data.path, "/data/ZApiro.png"),
+                    config: this.config
+                };
             }
             return {
                 loadingImageUrl: "".concat(this.data.path, "/data/ZApiro.png"),

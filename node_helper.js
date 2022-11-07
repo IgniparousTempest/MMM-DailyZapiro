@@ -1,6 +1,6 @@
 /**
  * MagicMirror Module: Daily Zapiro
- * A MagicMirror² Module to show cartoons by Zapiro.
+ * A MagicMirror² Module to display cartoons by Zapiro.
  * 
  * Version 1.0.0
  * By Courtney Pitcher
@@ -17,6 +17,31 @@ var Log = require('logger');
 var fetch = require('node-fetch');
 var fastXmlParser = require('fast-xml-parser');
 
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -30,15 +55,24 @@ module.exports = NodeHelper.create({
     socketNotificationReceived: function (notification, payload) {
         var _this = this;
         if (notification === "REQUEST_ZAPIRO_CARTOON") {
-            var url = 'https://www.dailymaverick.co.za/cartoon-sitemap2.xml';
-            fetch(url)
-                .then(function (response) { return response.text(); })
-                .then(function (text) {
-                Log.info("".concat(_this.name, ": Retrieving a new comic"));
+            Log.info("".concat(this.name, ": Retrieving a new comic"));
+            // The sitemap contains the first 1000 comics, and sitemap2 contains the latest comics.
+            var urls = ['https://www.dailymaverick.co.za/cartoon-sitemap2.xml'];
+            // Retrieve older comics if we want to iterate over the entire catalogue.
+            if (payload.mostRecentNComics > 100)
+                urls = __spreadArray(['https://www.dailymaverick.co.za/cartoon-sitemap.xml'], urls, true);
+            var promises = urls.map(function (url) { return fetch(url).then(function (response) { return response.text(); }); });
+            Promise.all(promises).then(function (xmlDocs) {
                 var parser = new fastXmlParser.XMLParser();
-                var jObj = parser.parse(text);
-                var comicUrls = jObj.urlset.url;
-                var latestComic = comicUrls[comicUrls.length - 1 - getRandomInt(0, payload.mostRecentNComics - 1)];
+                var comicDirectory = [];
+                for (var _i = 0, xmlDocs_1 = xmlDocs; _i < xmlDocs_1.length; _i++) {
+                    var xml = xmlDocs_1[_i];
+                    var jsObj = parser.parse(xml);
+                    var comicUrls = jsObj.urlset.url;
+                    comicDirectory = __spreadArray(__spreadArray([], comicDirectory, true), comicUrls, true);
+                }
+                var mostRecentNComics = payload.mostRecentNComics > comicDirectory.length ? comicDirectory : payload.mostRecentNComics;
+                var latestComic = comicDirectory[comicDirectory.length - 1 - getRandomInt(0, mostRecentNComics - 1)];
                 var comicUrl = latestComic['image:image']['image:loc'];
                 _this.sendSocketNotification("ZAPIRO_CARTOON", { url: comicUrl });
             });
