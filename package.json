@@ -7,7 +7,7 @@
         "build": "rollup -c"
     },
     "author": "Courtney Pitcher",
-    "license": "CC-BY-SA-NC-4.0",
+    "license": "CC-BY-NC-SA-4.0",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/IgniparousTempest/MMM-DailyZapiro.git"
